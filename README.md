@@ -39,213 +39,1178 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
 
-```ipynb
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "7"
-      ]
-     },
-     "execution_count": 1,
-     "metadata": {},
-     "output_type": "execute_result"
+# Lab Session Notebook - Returns
+
+## From Prices to Returns
+
+In this lab we'll work the very basics of Returns - computing returns, and compounding a sequence of returns.
+
+Let's start with a set of prices for a stock "A", in a python list:
+
+
+```python
+prices_a = [8.70, 8.91, 8.71]
+```
+
+Recall that the return from time $t$ to time ${t+1} is given by:
+
+$$ R_{t,t+1} = \frac{P_{t+1}-P_{t}}{P_{t}} $$
+
+or alternately
+
+$$ R_{t,t+1} = \frac{P_{t+1}}{P_{t}} - 1 $$
+
+If you come from R or another language that supports vectors, you might expect something like this to work:
+
+```python
+returns_a = prices_a[:-1]/prices_a[1:] - 1
+```
+
+However, since Python lists do not operate as vectors, that will not work, generating an error about "/" not working for lists.
+
+
+
+```python
+# WILL NOT WORK - THIS WILL GENERATE AN ERROR!
+# prices_a[1:]/prices_a[:-1] -1
+```
+
+Instead, we can convert them to a `numpy` array. Numpy arrays _do_ behave like vectors, so this works:
+
+
+```python
+import numpy as np
+
+prices_a = np.array([8.70, 8.91, 8.71])
+prices_a
+```
+
+
+
+
+    array([8.7 , 8.91, 8.71])
+
+
+
+
+```python
+prices_a[1:]/prices_a[:-1] - 1
+```
+
+
+
+
+    array([ 0.02413793, -0.02244669])
+
+
+
+Now, let's add a few more days of prices and introduce a second stock. Let's call these two stocks "BLUE" and "ORANGE". Instead of using raw numpy arrays, we are going to use the far more powerful Pandas DataFrame, which wraps the functionality of numpy into a very convenient and easy to use data structure called a DataFrame. Note how the DtaFrame has two nicely indexed columns as well as a row index that by default runs from 0 to 4.
+
+
+```python
+import pandas as pd
+
+prices = pd.DataFrame({"BLUE": [8.70, 8.91, 8.71, 8.43, 8.73],
+                       "ORANGE": [10.66, 11.08, 10.71, 11.59, 12.11]})
+```
+
+
+```python
+prices
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
-   ],
-   "source": [
-    "3+4"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "image/svg+xml": [
-       "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n",
-       "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"600\" height=\"400\" viewBox=\"0 0 2400 1600\">\n",
-       "<defs>\n",
-       "  <clipPath id=\"clip9400\">\n",
-       "    <rect x=\"0\" y=\"0\" width=\"2000\" height=\"2000\"/>\n",
-       "  </clipPath>\n",
-       "</defs>\n",
-       "<defs>\n",
-       "  <clipPath id=\"clip9401\">\n",
-       "    <rect x=\"0\" y=\"0\" width=\"2400\" height=\"1600\"/>\n",
-       "  </clipPath>\n",
-       "</defs>\n",
-       "<polygon clip-path=\"url(#clip9401)\" points=\"\n",
-       "0,1600 2400,1600 2400,0 0,0 \n",
-       "  \" fill=\"#ffffff\" fill-rule=\"evenodd\" fill-opacity=\"1\"/>\n",
-       "<defs>\n",
-       "  <clipPath id=\"clip9402\">\n",
-       "    <rect x=\"480\" y=\"0\" width=\"1681\" height=\"1600\"/>\n",
-       "  </clipPath>\n",
-       "</defs>\n",
-       "<polygon clip-path=\"url(#clip9401)\" points=\"\n",
-       "161.394,1503.47 2321.26,1503.47 2321.26,47.2441 161.394,47.2441 \n",
-       "  \" fill=\"#ffffff\" fill-rule=\"evenodd\" fill-opacity=\"1\"/>\n",
-       "<defs>\n",
-       "  <clipPath id=\"clip9403\">\n",
-       "    <rect x=\"161\" y=\"47\" width=\"2161\" height=\"1457\"/>\n",
-       "  </clipPath>\n",
-       "</defs>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  448.923,1503.47 448.923,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  901.725,1503.47 901.725,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  1354.53,1503.47 1354.53,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  1807.33,1503.47 1807.33,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  2260.13,1503.47 2260.13,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  161.394,1480.86 2321.26,1480.86 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  161.394,1192.5 2321.26,1192.5 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  161.394,904.15 2321.26,904.15 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  161.394,615.796 2321.26,615.796 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none\" points=\"\n",
-       "  161.394,327.443 2321.26,327.443 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,1503.47 2321.26,1503.47 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,1503.47 161.394,47.2441 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  448.923,1503.47 448.923,1481.63 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  901.725,1503.47 901.725,1481.63 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  1354.53,1503.47 1354.53,1481.63 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  1807.33,1503.47 1807.33,1481.63 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  2260.13,1503.47 2260.13,1481.63 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,1480.86 193.792,1480.86 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,1192.5 193.792,1192.5 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,904.15 193.792,904.15 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,615.796 193.792,615.796 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  161.394,327.443 193.792,327.443 \n",
-       "  \"/>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;\" transform=\"rotate(0, 448.923, 1557.47)\" x=\"448.923\" y=\"1557.47\">2</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;\" transform=\"rotate(0, 901.725, 1557.47)\" x=\"901.725\" y=\"1557.47\">4</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;\" transform=\"rotate(0, 1354.53, 1557.47)\" x=\"1354.53\" y=\"1557.47\">6</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;\" transform=\"rotate(0, 1807.33, 1557.47)\" x=\"1807.33\" y=\"1557.47\">8</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;\" transform=\"rotate(0, 2260.13, 1557.47)\" x=\"2260.13\" y=\"1557.47\">10</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;\" transform=\"rotate(0, 137.394, 1498.36)\" x=\"137.394\" y=\"1498.36\">0.0</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;\" transform=\"rotate(0, 137.394, 1210)\" x=\"137.394\" y=\"1210\">0.2</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;\" transform=\"rotate(0, 137.394, 921.65)\" x=\"137.394\" y=\"921.65\">0.4</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;\" transform=\"rotate(0, 137.394, 633.296)\" x=\"137.394\" y=\"633.296\">0.6</text>\n",
-       "</g>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;\" transform=\"rotate(0, 137.394, 344.943)\" x=\"137.394\" y=\"344.943\">0.8</text>\n",
-       "</g>\n",
-       "<polyline clip-path=\"url(#clip9403)\" style=\"stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  222.522,621.436 448.923,229.718 675.324,88.4582 901.725,1361.28 1128.13,1156.5 1354.53,1414.63 1580.93,383.717 1807.33,812.201 2033.73,1462.26 2260.13,1434.31 \n",
-       "  \n",
-       "  \"/>\n",
-       "<polygon clip-path=\"url(#clip9401)\" points=\"\n",
-       "1958.43,251.724 2249.26,251.724 2249.26,130.764 1958.43,130.764 \n",
-       "  \" fill=\"#ffffff\" fill-rule=\"evenodd\" fill-opacity=\"1\"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  1958.43,251.724 2249.26,251.724 2249.26,130.764 1958.43,130.764 1958.43,251.724 \n",
-       "  \"/>\n",
-       "<polyline clip-path=\"url(#clip9401)\" style=\"stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none\" points=\"\n",
-       "  1982.43,191.244 2126.43,191.244 \n",
-       "  \"/>\n",
-       "<g clip-path=\"url(#clip9401)\">\n",
-       "<text style=\"fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;\" transform=\"rotate(0, 2150.43, 208.744)\" x=\"2150.43\" y=\"208.744\">y1</text>\n",
-       "</g>\n",
-       "</svg>\n"
-      ]
-     },
-     "execution_count": 2,
-     "metadata": {},
-     "output_type": "execute_result"
+
+    .dataframe tbody tr th {
+        vertical-align: top;
     }
-   ],
-   "source": [
-    "using Plots\n",
-    "x = 1:10; y = rand(10); # These are the plotting data\n",
-    "plot(x,y)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Julia 1.1.0",
-   "language": "julia",
-   "name": "julia-1.1"
-  },
-  "language_info": {
-   "file_extension": ".jl",
-   "mimetype": "application/julia",
-   "name": "julia",
-   "version": "1.1.0"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 2
-}
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>8.70</td>
+      <td>10.66</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8.91</td>
+      <td>11.08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.71</td>
+      <td>10.71</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.43</td>
+      <td>11.59</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.73</td>
+      <td>12.11</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+**WARNING**
+
+However, because Pandas DataFrames will align the row index (in this case: 0, 1, 2, 3, 4) the exact same code fragment will not work as you might expect.  (see the section on row alignment in the "Crash Course" videos if this is unclear to you)
+
+
+```python
+prices.iloc[1:]
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>8.91</td>
+      <td>11.08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.71</td>
+      <td>10.71</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.43</td>
+      <td>11.59</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.73</td>
+      <td>12.11</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+prices.iloc[:-1]
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>8.70</td>
+      <td>10.66</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8.91</td>
+      <td>11.08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.71</td>
+      <td>10.71</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.43</td>
+      <td>11.59</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+prices.iloc[1:]/prices.iloc[:-1] - 1
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+We can fix this in one of several ways. First, we can extract the values of the DataFrame column which returns a numpy array, so that the DataFrame does not try and align the rows.
+
+
+```python
+prices.iloc[1:].values/prices.iloc[:-1] - 1
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.024138</td>
+      <td>0.039400</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-0.022447</td>
+      <td>-0.033394</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.032147</td>
+      <td>0.082166</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.035587</td>
+      <td>0.044866</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+You could have also used the values in the denominator:
+
+
+```python
+prices.iloc[1:]/prices.iloc[:-1].values - 1
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.024138</td>
+      <td>0.039400</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.022447</td>
+      <td>-0.033394</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.032147</td>
+      <td>0.082166</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.035587</td>
+      <td>0.044866</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+However, there are a couple of ways to do this without extracting the values, and these are probably a bit cleaner and more readable. The first option is to use the `.shift()` method on the array, which realigns the indices.
+
+
+```python
+prices
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>8.70</td>
+      <td>10.66</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8.91</td>
+      <td>11.08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.71</td>
+      <td>10.71</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.43</td>
+      <td>11.59</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.73</td>
+      <td>12.11</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Since we want to get the row at index 0 (8.84 and 10.66) to line up with the row at index 1 (8.54 and 10.30) so we can divide the 2nd row (at index 1) by the first row (at index 0) we want to shift the rows in the denominator by 1 ... which we do with `.shift(1)`
+
+
+```python
+prices.shift(1)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8.70</td>
+      <td>10.66</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.91</td>
+      <td>11.08</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.71</td>
+      <td>10.71</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.43</td>
+      <td>11.59</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+So, now we can obtain the returns on each day as follows:
+
+
+```python
+returns = prices/prices.shift(1) - 1
+returns
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.024138</td>
+      <td>0.039400</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.022447</td>
+      <td>-0.033394</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.032147</td>
+      <td>0.082166</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.035587</td>
+      <td>0.044866</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Note how we cannot compute returns for the first day, because we dont have the closing price for the previous day. In general, we lose one data point when we go from prices to returns.
+
+Finally, there is a built-in method in DataFrame that computes the percent change from one row to another. Since that is exactly what a return is (the percent change in price) we can just use this method to compute the return.
+
+
+
+```python
+returns = prices.pct_change()
+returns
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.024138</td>
+      <td>0.039400</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.022447</td>
+      <td>-0.033394</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.032147</td>
+      <td>0.082166</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.035587</td>
+      <td>0.044866</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+## Reading data from a CSV file
+Since typing in returns is tedious, let's read the data in from a file. Pandas provides a convenient and simple way to read in a CSV file of the returns.
+
+
+```python
+prices = pd.read_csv('data/sample_prices.csv')
+prices
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>8.7000</td>
+      <td>10.6600</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8.9055</td>
+      <td>11.0828</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8.7113</td>
+      <td>10.7100</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.4346</td>
+      <td>11.5907</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.7254</td>
+      <td>12.1070</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>9.0551</td>
+      <td>11.7876</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>8.9514</td>
+      <td>11.2078</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>9.2439</td>
+      <td>12.5192</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9.1276</td>
+      <td>13.3624</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>9.3976</td>
+      <td>14.4080</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>9.4554</td>
+      <td>11.9837</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>9.5704</td>
+      <td>12.2718</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>9.7728</td>
+      <td>11.5892</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+returns = prices.pct_change()
+returns
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.023621</td>
+      <td>0.039662</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.021807</td>
+      <td>-0.033638</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.031763</td>
+      <td>0.082232</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.034477</td>
+      <td>0.044544</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.037786</td>
+      <td>-0.026381</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-0.011452</td>
+      <td>-0.049187</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.032676</td>
+      <td>0.117008</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-0.012581</td>
+      <td>0.067353</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.029581</td>
+      <td>0.078249</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.006151</td>
+      <td>-0.168261</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>0.012162</td>
+      <td>0.024041</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0.021149</td>
+      <td>-0.055623</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+returns.mean()
+```
+
+
+
+
+    BLUE      0.01
+    ORANGE    0.01
+    dtype: float64
+
+
+
+
+```python
+returns.std()
+```
+
+
+
+
+    BLUE      0.023977
+    ORANGE    0.079601
+    dtype: float64
+
+
+
+
+```python
+returns.plot.bar()
+```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1187c10f0>
+
+
+
+
+```python
+prices.plot()
+```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x118b53d30>
+
+
+
+
+    
+![png](lab_101_files/lab_101_32_1.png)
+    
+
+
+## Compounding Returns
+
+Now that we have a series of 12 monthly returns, we can produce the compounded return by multiplying the individual period returns, as long as the returns are expressed as growth rates in what I call "1+R" format.
+
+To compound the returns, all we need to do is add 1 to each return and then multiply them. The result is itself in "1+R" format, so we need to subtract 1.
+
+Let's compute the compounded return of our two series. 
+
+
+```python
+returns + 1
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BLUE</th>
+      <th>ORANGE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.023621</td>
+      <td>1.039662</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.978193</td>
+      <td>0.966362</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.968237</td>
+      <td>1.082232</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.034477</td>
+      <td>1.044544</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.037786</td>
+      <td>0.973619</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.988548</td>
+      <td>0.950813</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.032676</td>
+      <td>1.117008</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.987419</td>
+      <td>1.067353</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.029581</td>
+      <td>1.078249</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.006151</td>
+      <td>0.831739</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1.012162</td>
+      <td>1.024041</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1.021149</td>
+      <td>0.944377</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+np.prod(returns+1)
+```
+
+
+
+
+    BLUE      1.123310
+    ORANGE    1.087167
+    dtype: float64
+
+
+
+
+```python
+(returns+1).prod()
+```
+
+
+
+
+    BLUE      1.123310
+    ORANGE    1.087167
+    dtype: float64
+
+
+
+
+```python
+(returns+1).prod()-1
+```
+
+
+
+
+    BLUE      0.123310
+    ORANGE    0.087167
+    dtype: float64
+
+
+
+
+```python
+(((returns+1).prod()-1)*100).round(2)
+```
+
+
+
+
+    BLUE      12.33
+    ORANGE     8.72
+    dtype: float64
+
+
+
+## Annualizing Returns
+
+To annualize a return for a period, you compound the return for as many times as there are periods in a year. For instance, to annualize a monthly return you compund that return 12 times. The formula to annualize a monthly return $R_m$ is:
+
+$$ (1+R_m)^{12} - 1$$
+
+To annualize a quarterly return $R_q$ you would get:
+
+$$ (1+R_q)^{4} - 1$$
+
+And finally, to annualize a daily return $R_d$ you would get:
+
+$$ (1+R_d)^{252} - 1$$
+
+For example, to annualize a 1% monthly, and 4% quarterly and a 0.01% daily return you would do:
+
+
+```python
+rm = 0.01
+(1+rm)**12 - 1
+```
+
+
+
+
+    0.12682503013196977
+
+
+
+
+```python
+rq = 0.04
+(1+rq)**4 - 1
+```
+
+
+
+
+    0.1698585600000002
+
+
+
+
+```python
+
 ```
