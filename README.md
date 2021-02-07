@@ -18,7 +18,7 @@ Syntax highlighted code block
 - Bulleted
 - List
 
-https://github.com/cenkt/cenkt.github.io/blob/master/Untitled1.ipynb
+
 
 1. Numbered
 2. List
@@ -27,6 +27,7 @@ https://github.com/cenkt/cenkt.github.io/blob/master/Untitled1.ipynb
 
 [Link](url) and ![Image](src)
 ```
+https://github.com/cenkt/cenkt.github.io/blob/master/Untitled1.ipynb
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
